@@ -12,6 +12,10 @@ const int led_pin = 2;
 const int cosmic_ray = 1;
 int strobe_rate = 250 / number_of_leds;  // set total time for strobe
 
+// LED setup 2
+const int led_pin2 = 3;
+const int number_of_leds2 = 24;  // number of leds in strip
+
 char ssid[] = "---";  // your network SSID (name)
 char pass[] = "---";
 OSCErrorCode error;
@@ -37,6 +41,7 @@ int ping = 0;
 
 
 Adafruit_NeoPixel leds = Adafruit_NeoPixel(number_of_leds, led_pin);
+Adafruit_NeoPixel leds2 = Adafruit_NeoPixel(number_of_leds2, led_pin2);
 
 
 void setup() {
@@ -50,10 +55,20 @@ void setup() {
   leds.clear();
   leds.setBrightness(50);
 
+  // Setup LEDs2
+  leds2.begin();
+  leds2.clear();
+  leds2.setBrightness(50);
+
   for (int i = 0; i < number_of_leds; i++) {
     leds.setPixelColor(i, r, g, b);
   }
   leds.show();
+
+  for (int i = 0; i < number_of_leds2; i++) {
+    leds.setPixelColor(i, r, g, b);
+  }
+  leds2.show();
 
   // Start WiFi
   Serial.print("Connecting to ");
@@ -80,6 +95,7 @@ void loop() {
   if (ping == 1) {
     if (strobing == 1) {
       strobe();
+      strobe2();
     }
 
     sendOSC();
@@ -101,7 +117,18 @@ void strobe() {
   }
   leds.clear();
   leds.show();
-}
+  }
+
+void strobe2() {
+  for (int i = 0; i < number_of_leds2; i++) {
+    leds2.clear();
+    leds2.setPixelColor(i, r, g, b);
+    delay(strobe_rate);
+    leds2.show();
+  }
+  leds2.clear();
+  leds2.show();
+  }
 
 void sendOSC() {
   OSCMessage msg("/cosmic_ray");
@@ -149,6 +176,11 @@ void rgb(OSCMessage &msg) {
     leds.setPixelColor(i, r, g, b);
   }
   leds.show();
+
+  for (int i = 0; i < number_of_leds2; i++) {
+    leds2.setPixelColor(i, r, g, b);
+  }
+  leds2.show();
 }
 
 void led(OSCMessage &msg) {
@@ -161,6 +193,11 @@ void led(OSCMessage &msg) {
       leds.setPixelColor(i, r, g, b);
     }
     leds.show();
+
+    for (int i = 0; i < number_of_leds2; i++) {
+      leds2.setPixelColor(i, r, g, b);
+    }
+    leds2.show();
   }
 
   if (ledState == 0) {
@@ -169,6 +206,11 @@ void led(OSCMessage &msg) {
       leds.setPixelColor(i, 0, 0, 0);
     }
     leds.show();
+
+    for (int i = 0; i < number_of_leds2; i++) {
+      leds2.setPixelColor(i, 0, 0, 0);
+    }
+    leds2.show();
   }
 
   if (ledState == 2) {
